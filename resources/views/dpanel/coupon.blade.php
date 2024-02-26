@@ -102,7 +102,7 @@
                                     </td>
 
                                     <td class="pl-3 py-3">
-                                        <div class="text-sm text-gray-200">{{$item->value}}</div>
+                                        <div class="text-sm text-gray-200">$ {{$item->value}}</div>
                                     </td>
 
                                     <td class="pl-3 py-3">

@@ -120,7 +120,7 @@
                                     <input type="checkbox" name="size" id="size-{{$item->id}}" 
                                     value="{{$item->id}}"
                                     @if (request()->size) @checked(in_array($item->id, explode(',', urldecode(request()->size)))) @endif> 
-                                    <label class="cursor-pointer" for="size-{{$item->id}}">{{$item->name}}({{$item->code}})</label>
+                                    <label class="cursor-pointer" for="size-{{$item->id}}">{{$item->name}} ({{$item->code}})</label>
                                 </li>
                             @endforeach
                             <input type="hidden" name="size" value="">

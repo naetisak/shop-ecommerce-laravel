@@ -6,23 +6,25 @@
 @endpush
 
 @push('scripts')
-    <script src="{{asset('js/owl.carousel.min.js')}}"></script>
+    <script src="{{ asset('js/owl.carousel.min.js') }}"></script>
     <script>
-        $(document).ready(function(){
+        $(document).ready(function() {
             $(".banner-carousel").owlCarousel({
-                loop:true,
-                margin:10,
-                nav:false,
-                dots:false,
-                responsiveClass:true,
-                responsive:{
-                    0:{
+                loop: true,
+                margin: 10,
+                nav: false,
+                dots: false,
+                autoplay: true,
+                autoplayTimeout: 4500,
+                responsiveClass: true,
+                responsive: {
+                    0: {
                         items: 1,
                     },
-                    600:{
+                    600: {
                         items: 1,
                     },
-                    1000:{
+                    1000: {
                         items: 1,
                     }
                 }
@@ -54,11 +56,12 @@
     </script>
 @endpush
 
+
 @section('body_content')
     <div>
         <div class="banner-carousel owl-carousel h-min">
             @foreach ($banners as $banner)
-            <a href="{{ $banner->link ?? '#' }}"><img src="{{asset('storage/' . $banner->path)}}" alt=""></a>   
+                <a href="{{ $banner->link ?? '#' }}"><img src="{{ asset('storage/' . $banner->path) }}" alt=""></a>
             @endforeach
         </div>
     </div>
@@ -78,6 +81,7 @@
         <div class="coupon-carousel owl-carousel flex flex-wrap gap-6">
             @foreach ($coupons as $item)
                 <div class="bg-white rounded-md shadow mb-2 flex justify-between items-center gap-3">
+
                     <div class="flex flex-col pl-3 py-1">
                         <span class="text-gray-400 leading-5">New Coupon</span>
                         <strong class="text-orange-500">#{{ $item->code }}</strong>
@@ -85,10 +89,11 @@
 
                     <div class="bg-violet-600 w-14 font-medium text-white p-3 rounded-r-md">
                         @if ($item->type == 'Percentage')
-                            {{$item->value}}% Off
+                            {{ $item->value }}% Off
                         @else
-                            ${{$item->value}} Off
+                            ${{ $item->value }} Off
                         @endif
+
                     </div>
                 </div>
             @endforeach

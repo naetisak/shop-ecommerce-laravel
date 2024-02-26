@@ -31,8 +31,8 @@
 
                             <div>
                                 <label class="text-white">Size</label>
-                                <select name="size_id[]" class="w-full bg-white border border-gray-700 rounded py-0.5 focus:outline-none" required>
-                                    <option value="">select</option>
+                                <select name="size_id[]" 
+                                    class="w-full bg-white border border-gray-700 rounded py-0.5 focus:outline-none" required>
                                     ${sizeOptions}
                                 </select>
                             </div>
@@ -186,7 +186,8 @@
 
                     <div>
                         <label class="text-white">Size</label>
-                        <select name="size_id[]" class="w-full bg-white border border-gray-700 rounded py-0.5 focus:outline-none" required>
+                        <select name="size_id[]" 
+                            class="w-full bg-white border border-gray-700 rounded py-0.5 focus:outline-none" required>
                             <option value="">select</option>
                             @foreach ($sizes as $item) required
                                 <option value="{{$item->id}}"@selected($item->id==$variantItem->size_id)>{{$item->name}}</option>

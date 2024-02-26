@@ -17,7 +17,7 @@
         <p>Order Status: <span class="font-medium"><select onchange="updateStatus(this,'{{$order->id}}')"
             class="border rounded focus:outline-none">
            <option value="PENDING" @selected($order->status == 'PENDING')>PENDING</option>
-           <option value="PAIN OUT" @selected($order->status == 'PAIN OUT')>PAIN OUT</option>
+           <option value="PACKED" @selected($order->status == 'PACKED')>PACKED</option>
            <option value="DISPATCHED" @selected($order->status == 'DISPATCHED')>DISPATCHED</option>
            <option value="ON WAY" @selected($order->status == 'ON WAY')>ON WAY</option>
            <option value="DELIVERED" @selected($order->status == 'DELIVERED')>DELIVERED</option>

@@ -2,60 +2,28 @@
 
 @push('scripts')
     <script>
-        const getDistrictStateByPinCode = (e, district = null, state = null) => {
+        const populateDistrictState = () => {
+            const district = document.getElementById('district').value;
+            const state = document.getElementById('state').value;
 
-            let calledApi = false;
+            const districtSelect = document.getElementById('district');
+            const stateSelect = document.getElementById('state');
 
-            if (calledApi) return;
+            // Populate district options
+            districtSelect.innerHTML = `<option value="${district}">${district}</option>`;
 
-            let _district = document.getElementById('district');
-            let _state = document.getElementById('state');
-            let pincode = typeof e === 'string' ? e : e.value;
+            // Populate state options
+            stateSelect.innerHTML = `<option value="${state}">${state}</option>`;
+        }
 
-            if (pincode.length == 6) {
-                calledApi = true;
-                fetch(`https://api.postalpincode.in/pincode/${pincode}`)
-                    .then((response) => response.json())
-                    .then((data) => {
-                        data = data[0];
-                        if (data.Status == 'Success') {
-                            var distItems = [];
-                            var stateItems = [];
-                            data.PostOffice.forEach(ele => {
-                                if (distItems.indexOf(ele.District) === -1) distItems.push(ele.District)
-                                if (stateItems.indexOf(ele.State) === -1) stateItems.push(ele.State)
-                            });
-                            if (distItems.length == 1) {
-                                _district.innerHTML = `<option value="${distItems[0]}">${distItems[0]}</option>`;
-                            } else {
-                                let html = '<option value="">select</option>';
-                                distItems.forEach(element => {
-                                    html +=
-                                        `<option value="${element}" ${element==district?'selected':''}>${element}</option>`;
-                                });
-                                _district.innerHTML = html;
-                            }
-                            if (stateItems.length == 1) {
-                                _state.innerHTML = `<option value="${stateItems[0]}">${stateItems[0]}</option>`;
-                            } else {
-                                let html = '<option value="">select</option>';
-                                stateItems.forEach(element => {
-                                    html +=
-                                        `<option value="${element}" ${element==state?'selected':''}>${element}</option>`;
-                                });
-                                _state.innerHTML = html;
-                            }
-                        } else {
-                            toast.error(data.Message);
-                        }
-                    });
+        // Execute the function when the pin code is entered
+        const onPinCodeEntered = (input) => {
+            const pinCode = input.value.trim();
+
+            if (pinCode.length === 5) {
+                populateDistrictState();
             }
         }
-        @auth
-        @if ($data->pin_code)
-            getDistrictStateByPinCode("{{ $data->pin_code }}", "{{ $data->district }}", "{{ $data->state }}");
-        @endif
-        @endauth
     </script>
 @endpush
 
@@ -129,22 +97,22 @@
                         <div class="mt-4 relative border border-slate-300 rounded">
                             <label for="" class="absolute -top-3.5 left-3 bg-gray-50 px-1 text-gray-400">Pin
                                 Code</label>
-                            <input type="tel" onkeyup="getDistrictStateByPinCode(this)" value="{{ $data->pin_code }}"
-                                maxlength="6" name="pin_code" class="mt-2 px-3 bg-transparent focus:outline-none w-full">
+                            <input type="tel"  value="{{ $data->pin_code }}"
+                                maxlength="5" name="pin_code" class="mt-2 px-3 bg-transparent focus:outline-none w-full">
                         </div>
 
                         <div class="mt-4 relative border border-slate-300 rounded">
                             <label for=""
                                 class="absolute -top-3.5 left-3 bg-gray-50 px-1 text-gray-400">District</label>
-                            <select name="district" id="district" class="mt-2 px-3 bg-transparent focus:outline-none w-full"
+                            <input type="text" value="{{ $data->district }}" name="district" id="district" class="mt-2 px-3 bg-transparent focus:outline-none w-full"
                                 required>
-                            </select>
+                            </input>
                         </div>
                         <div class="mt-4 relative border border-slate-300 rounded">
                             <label for="" class="absolute -top-3.5 left-3 bg-gray-50 px-1 text-gray-400">State</label>
-                            <select name="state" id="state" class="mt-2 px-3 bg-transparent focus:outline-none w-full"
+                            <input type="text" value="{{ $data->state }}" name="state" id="state" class="mt-2 px-3 bg-transparent focus:outline-none w-full"
                                 required>
-                            </select>
+                            </input>
                         </div>
 
                         <div>

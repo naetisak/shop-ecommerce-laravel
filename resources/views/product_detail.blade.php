@@ -22,26 +22,26 @@
 
         const viewImage = (e, index) => {
 
-        currentImage = index;
+            currentImage = index;
 
-        document.getElementById('bigImage').src = e.querySelector('img').src;
+            document.getElementById('bigImage').src = e.querySelector('img').src;
         }
 
         const nextPrevious = (index) => {
 
-        i = currentImage + index;
+            i = currentImage + index;
 
-        let images = document.getElementById('images').querySelectorAll('img');
+            let images = document.getElementById('images').querySelectorAll('img');
 
-        if (i >= images.length || i < 0) return;
+            if (i >= images.length || i < 0) return;
 
-        currentImage = i;
+            currentImage = i;
 
-        let arr = [];
+            let arr = [];
 
-        images.forEach(element => arr.push(element.src));
+            images.forEach(element => arr.push(element.src));
 
-        document.getElementById('bigImage').src = arr[currentImage];
+            document.getElementById('bigImage').src = arr[currentImage];
         }
 
         const addToCart = () => {
@@ -67,7 +67,6 @@
             cartCount();
             return true;
         }
-
         const buyNow = () => {
             if (addToCart()) {
                 window.location.href = "{{ route('cart') }}";
@@ -87,57 +86,57 @@
 
         <div class="flex flex-wrap md:flex-nowrap gap-6">
             {{-- Left --}}
-            <div class="shrink-0 md:w-auto w-full flex flex-col-reverse md:flex-row gap-4">
+            <div class="shrink-0 w-full md:w-auto flex flex-col-reverse md:flex-row gap-4">
                 <div id="images" class="flex md:flex-col gap-3 pb-1 md:pb-0 max-h-96 overflow-y-auto">
                     @foreach ($product->image as $image)
-                    <div onclick="viewImage(this,'{{$image->id}}')" 
-                        class="bg-white rounded-md shadow p-1 cursor-pointer">
-                        <img class="w-14" src="{{asset('storage/' . $image->path)}}" alt="">
-                    </div>
+                        <div onclick="viewImage(this, {{ $image->id }})"
+                            class="bg-white rounded-md shadow p-1 cursor-pointer">
+                            <img class="w-14" src="{{ asset('storage/' . $image->path) }}" alt="" />
+                        </div>
                     @endforeach
                 </div>
-
                 <div class="h-96 relative bg-white rounded-md shadow-md p-3">
-                    <img id="bigImage" class="h-full aspect-[2/3]" src="{{asset('storage/' .$product->image[0]->path)}}" alt="">
+                    <img id="bigImage" class="h-full aspect-[2/3]" src="{{ asset('storage/' . $product->image[0]->path) }}"
+                        alt="">
 
                     <span onclick="nextPrevious(-1)"
                         class="absolute top-1/2 left-1 bg-white rounded-full w-5 h-5 shadow flex items-center justify-center">
-                        <i class='bx bx-chevron-left text-xl text-gray-400 hover:text-violet-600 duration-200 cursor-pointer' ></i>
+                        <i
+                            class='bx bx-chevron-left text-xl text-gray-400 hover:text-violet-600 duration-200 cursor-pointer'></i>
                     </span>
-
                     <span onclick="nextPrevious(1)"
                         class="absolute top-1/2 right-1 bg-white rounded-full w-5 h-5 shadow flex items-center justify-center">
-                        <i class='bx bx-chevron-right text-xl text-gray-400 hover:text-violet-600 duration-200 cursor-pointer' ></i>
+                        <i
+                            class='bx bx-chevron-right text-xl text-gray-400 hover:text-violet-600 duration-200 cursor-pointer'></i>
                     </span>
                 </div>
             </div>
             {{-- Left End --}}
 
             {{-- Right --}}
-
-            <div class="w-ful flex flex-col gap-4">
+            <div class="w-full flex flex-col gap-4">
                 <div class="flex gap-3">
                     @php
                         $discount = (($product->variant[0]->mrp - $product->variant[0]->selling_price) / $product->variant[0]->mrp) * 100;
                     @endphp
                     <span class="bg-red-500 text-white rounded px-2 text-xs">{{ round($discount, 2) }}% Off</span>
-                    <span class="text-amber-500 text-sm"><i class='bx bx-star'></i> 4.5</span>
-                </div>
-                {{-- Name, SKU, Brand --}}
-                <h2 class="text-lg font-medium text-gray-800"> {{$product->title}}</h2>
-                <div class="text-sn text-gray-800">
-                    <p><span class="text-gray-400 ">SKU:</span> {{$product->variant[0]->sku}}</p>
-                    <p><span class="text-gray-400 ">Brand:</span> {{$product->brand->name}}</p>
+                    <span class="text-gray-400 text-sm"><i class='bx bx-star'></i> 4.5</span>
                 </div>
 
-                
+                {{-- Name, SKU, Brand --}}
+                <h2 class="text-lg font-medium text-gray-800">{{ $product->title }}</h2>
+                <div class="text-sm text-gray-800">
+                    <p><span class="text-gray-400">SKU:</span> {{ $product->variant[0]->sku }}</p>
+                    <p><span class="text-gray-400">Brand:</span> {{ $product->brand->name }}</p>
+                </div>
+
                 {{-- Price --}}
                 <div>
-                    <span class="text-rose-500 font-bold text-xl">${{$product->variant[0]->selling_price}}</span>
-                    <sub class="text-gray-400"><strike>${{$product->variant[0]->mrp}}</strike></sub>
+                    <span class="text-rose-500 font-bold text-xl">₹{{ $product->variant[0]->selling_price }}</span>
+                    <sub class="text-gray-400"><strike>₹{{ $product->variant[0]->mrp }}</strike></sub>
                 </div>
 
-                {{-- Color --}}
+                {{-- Colors --}}
                 <div>
                     <p class="text-gray-400">Colors:</p>
                     <div class="flex gap-1">
@@ -148,9 +147,8 @@
                         @endforeach
                     </div>
                 </div>
-                {{-- End Color --}}
 
-                {{-- Size --}}
+                {{-- Sizes --}}
                 <div>
                     <p class="text-gray-400">Sizes:</p>
                     <div class="flex gap-1 text-gray-400 text-sm">
@@ -161,25 +159,24 @@
                     </div>
                     <a href="#" class="text-gray-400 text-xs">Size Guide</a>
                 </div>
-                {{-- End size --}}
 
                 {{-- Quantity --}}
                 {{-- <div>
                     <p class="text-gray-400">Quantity</p>
                     <div class="flex items-center gap-2">
-                        <input type="text" value="1" readonly 
-                        class="bg-slate-200 rounded border border-gray-300 focus:outline-none px-2 text-lg font-medium w-20">
-                        <button class="rounded border border-gray-300 w-7 h-7"><i class='bx bx-minus text-xl' ></i></button>
-                        <button class="rounded border border-gray-300 w-7 h-7"><i class='bx bx-plus text-xl'  ></i></button>
+                        <input type="text" value="1" readonly
+                            class="bg-slate-200 rounded border border-gray-300 focus:outline-none px-2 text-lg font-medium w-20">
+                        <button class="rounded border border-gray-300 w-7 h-7"><i class='bx bx-minus text-xl'></i></button>
+                        <button class="rounded border border-gray-300 w-7 h-7"><i class='bx bx-plus text-xl'></i></button>
                     </div>
                 </div> --}}
-                {{-- End Quantity --}}
 
                 {{-- Wishlist, Add to Cart and Buy Now --}}
                 <div class="flex items-center gap-4">
-                    <span class="bg-white shadow-md rounded-full w-8 h-8 flex items-center justify-center">
-                        <i class='bx bx-heart text-2xl text-gray-500' ></i>
-                    </span>
+                    <button onclick="toggleWishlist(this, '{{ $product->id }}')" class="bg-white shadow-md rounded-full w-7 h-7 flex items-center justify-center">
+                        <i class='bx  {{ $product->has_favorited ? 'bxs-heart text-red-500' : 'bx-heart' }} text-xl'></i>
+                    </button>
+
                     <button onclick="addToCart()" id="add_to_cart_btn"
                         class="border border-violet-600 rounded w-28 text-center drop-shadow font-medium text-violet-600 py-0.5">Add
                         to Cart</button>
@@ -187,26 +184,26 @@
                         class="border border-violet-600 rounded w-28 text-center drop-shadow font-medium text-white bg-violet-600 py-0.5">Buy
                         Now</button>
                 </div>
-                {{-- End Add Cart and Buy Now --}}
-                
+
             </div>
-            {{-- Right End --}}
+            {{-- Right End  --}}
         </div>
 
-        {{-- Description --}}
+        {{-- Product Description --}}
         <div>
             <h3 class="text-lg text-gray-400 font-medium my-6">Product Description</h3>
             <div class="text-gray-600">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus illum excepturi itaque rerum soluta expedita explicabo
-                vero. Unde, aut? Architecto sapiente libero, est nulla qui minima sit natus quis sed tempora ad accusamus perferendis
-                fugit similique voluptate nemo impedit vel ab voluptatibus soluta praesentium facere voluptates fugiat? Incidunt libero 
-                vel natus molestiae nulla. Debitis dolores officia cupiditate reprehenderit earum nemo fugit voluptatem, rem alias
-                nihil, dolor, quo laudantium aliquam vel dicta blanditiis odio quia nisi recusandae autem aspernatur delectus quae 
-                voluptatum pariatur? Repellendus, labore deserunt! Dignissimos voluptatibus enim magni necessitatibus odit illum 
-                numquam vitae aut consequuntur, iure quos, provident ipsa.
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad tenetur consectetur aspernatur veritatis rem,
+                asperiores necessitatibus corporis doloremque repellendus et cumque reprehenderit, nisi vitae autem iste
+                quia temporibus, fugiat ea voluptates velit tempora quae! Cupiditate debitis eaque ex. Similique aperiam
+                rerum inventore est fugiat, optio amet ratione sequi doloribus illum iure suscipit voluptatum ut repellat
+                non, impedit, et harum? Ipsam porro deleniti voluptatum fugiat quibusdam. Blanditiis eos perspiciatis
+                voluptatum. Deserunt praesentium fuga quisquam neque possimus, adipisci officiis. Sit quo a voluptas quidem
+                minima debitis culpa aliquam voluptatibus repellendus repudiandae explicabo totam, quaerat odit, in alias
+                facere ullam, commodi expedita fugit!
             </div>
         </div>
-        {{-- End Description --}}
+
 
         <section class="mt-6">
             <h3 class="text-gray-800 font-medium mb-2">Featured Product</h3>

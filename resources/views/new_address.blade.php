@@ -1,54 +1,7 @@
 @extends('layouts.app')
 
 @push('scripts')
-    <script>
-        const getDistrictStateByPinCode = (e) => {
-            let calledApi = false;
 
-            if (calledApi) return;
-
-            let district = document.getElementById('district');
-            let state = document.getElementById('state');
-
-            if (e.value.length == 6) {
-                calledApi = true;
-                fetch(`https://api.postalpincode.in/pincode/${e.value}`)
-                    .then((response) => response.json())
-                    .then((data) => {
-                        data = data[0];
-                        console.log(data);
-                        if (data.Status == 'Success') {
-                            var distItems = [];
-                            var stateItems = [];
-                            data.PostOffice.forEach(ele => {
-                                if (distItems.indexOf(ele.District) === -1) distItems.push(ele.District)
-                                if (stateItems.indexOf(ele.State) === -1) stateItems.push(ele.State)
-                            });
-                            if (distItems.length == 1) {
-                                district.innerHTML = `<option value="${distItems[0]}">${distItems[0]}</option>`;
-                            } else {
-                                let html = '<option value="">select</option>';
-                                distItems.forEach(element => {
-                                    html += `<option value="${element}">${element}</option>`;
-                                });
-                                district.innerHTML = html;
-                            }
-                            if (stateItems.length == 1) {
-                                state.innerHTML = `<option value="${stateItems[0]}">${stateItems[0]}</option>`;
-                            } else {
-                                let html = '<option value="">select</option>';
-                                stateItems.forEach(element => {
-                                    html += `<option value="${element}">${element}</option>`;
-                                });
-                                state.innerHTML = html;
-                            }
-                        } else {
-                            toast.error(data.Message);
-                        }
-                    });
-            }
-        }
-    </script>
 @endpush
 
 @section('body_content')
@@ -121,22 +74,21 @@
                         <div class="mt-4 relative border border-slate-300 rounded">
                             <label for="" class="absolute -top-3.5 left-3 bg-gray-50 px-1 text-gray-400">Pin
                                 Code</label>
-                            <input type="tel" onkeyup="getDistrictStateByPinCode(this)" maxlength="6" name="pin_code"
+                            <input type="tel" maxlength="5" name="pin_code"
                                 class="mt-2 px-3 bg-transparent focus:outline-none w-full">
                         </div>
 
                         <div class="mt-4 relative border border-slate-300 rounded">
-                            <label for=""
-                                class="absolute -top-3.5 left-3 bg-gray-50 px-1 text-gray-400">District</label>
-                            <select name="district" id="district" class="mt-2 px-3 bg-transparent focus:outline-none w-full"
+                            <label for="" class="absolute -top-3.5 left-3 bg-gray-50 px-1 text-gray-400">District</label>
+                            <input type="text" name="district" id="district" class="mt-2 px-3 bg-transparent focus:outline-none w-full"
                                 required>
-                            </select>
+                            </input>
                         </div>
                         <div class="mt-4 relative border border-slate-300 rounded">
                             <label for="" class="absolute -top-3.5 left-3 bg-gray-50 px-1 text-gray-400">State</label>
-                            <select name="state" id="state" class="mt-2 px-3 bg-transparent focus:outline-none w-full"
+                            <input type="text" name="state" id="state" class="mt-2 px-3 bg-transparent focus:outline-none w-full"
                                 required>
-                            </select>
+                            </input>
                         </div>
 
                         <div>

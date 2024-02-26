@@ -6,18 +6,18 @@
     <script>
     
         
-        const addVariant = (e)=>{
-            let colorOptions = '<option value="">Select</option>';
-            let sizeOptions = '<option value="">Select</option>';
+        const addVariant = (e) => {
+            let colorOptions = '<option value="">select</option>';
+            let sizeOptions = '<option value="">select</option>';
 
             let colors = @json($colors);
-            colors.forEach(color =>{
-                colorOptions += `<option value= "${color.id}">${color.name}</option>`;
+            colors.forEach(color => {
+                colorOptions += `<option value="${color.id}">${color.name}</option>`;
             });
 
             let sizes = @json($sizes);
-            sizes.forEach(size =>{
-                sizeOptions += `<option value= "${size.id}">${size.name}</option>`;
+            sizes.forEach(size => {
+                sizeOptions += `<option value="${size.id}">${size.name}</option>`;
             });
 
             let html = `<div class="flex justify-between gap-3 mb-2 border-b border-gray-400 pb-2">
@@ -31,8 +31,8 @@
 
                             <div>
                                 <label class="text-white">Size</label>
-                                <select name="size_id[]" class="w-full bg-white border border-gray-700 rounded py-0.5 focus:outline-none" required>
-                                    <option value="">Select</option>
+                                <select name="size_id[]"
+                                    class="w-full bg-white border border-gray-700 rounded py-0.5 focus:outline-none" required>
                                     ${sizeOptions}
                                 </select>
                             </div>
@@ -175,10 +175,11 @@
 
                     <div>
                         <label class="text-white">Size</label>
-                        <select name="size_id[]" class="w-full bg-white border border-gray-700 rounded py-0.5 focus:outline-none" required>
-                            <option value="">Select</option>
-                            @foreach ($sizes as $item) required
-                                <option value="{{$item->id}}">{{$item->name}}</option>
+                        <select name="size_id[]"
+                            class="w-full bg-white border border-gray-700 rounded py-0.5 focus:outline-none" required>
+                            <option value="">select</option>
+                            @foreach ($sizes as $item)
+                                <option value="{{ $item->id }}">{{ $item->name }}</option>
                             @endforeach
                         </select>
                     </div>

@@ -94,7 +94,7 @@
                                         <select onchange="updateStatus(this,'{{$item->id}}')"
                                              class="border rounded focus:outline-none">
                                             <option value="PENDING" @selected($item->status == 'PENDING')>PENDING</option>
-                                            <option value="PAIN OUT" @selected($item->status == 'PAIN OUT')>PAIN OUT</option>
+                                            <option value="PACKED" @selected($item->status == 'PACKED')>PACKED</option>
                                             <option value="DISPATCHED" @selected($item->status == 'DISPATCHED')>DISPATCHED</option>
                                             <option value="ON WAY" @selected($item->status == 'ON WAY')>ON WAY</option>
                                             <option value="DELIVERED" @selected($item->status == 'DELIVERED')>DELIVERED</option>
