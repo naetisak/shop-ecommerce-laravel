@@ -1,13 +1,14 @@
 @extends('layouts.app')
 
 @push('scripts')
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
+        // ฟังก์ชันตรวจสอบว่าตะกร้าสินค้าไม่ว่างหรือไม่
         const isCartNotEmpty = () => {
             let items = mCart._getItems();
             return items != null ? Object.keys(items).length : 0;
         }
 
+        // ฟังก์ชันที่ใช้สำหรับแสดงหน้าว่างเมื่อตะกร้าสินค้าว่าง
         const setEmptyView = () => {
             document.getElementById('itemContainer').innerHTML = `<div class="md:col-span-2 flex flex-col gap-2 justify-center items-center">
                         <img src="{{ asset('images/empty_cart.png') }}" alt="">
@@ -18,13 +19,16 @@
                     </div>`;
         }
 
+        // ฟังก์ชันสำหรับลบสินค้าออกจากตะกร้า
         const removeItem = (e, id) => {
             mCart.remove(id);
             e.parentElement.parentElement.parentElement.remove();
 
+            // ตรวจสอบว่าตะกร้าสินค้าไม่ว่างหรือไม่ หากว่างให้แสดงหน้าว่าง
             isCartNotEmpty() ? null : setEmptyView();
         }
 
+        // ฟังก์ชันสำหรับการเรียกใช้คูปองส่วนลด
         const applyCoupon = () => {
             let discountCode = document.getElementById('discount_code');
             if (discountCode.value == '' || discountCode.value.length == 0) return;
@@ -36,6 +40,7 @@
                     let coupon = res.data;
                     let subtotal = mCart.getSubTotal();
 
+                    // ตรวจสอบว่ายอดรวมของสินค้ามากกว่ายอดขั้นต่ำของคูปองหรือไม่
                     if (coupon.min_cart_amount != '' && coupon.min_cart_amount > subtotal) {
                         cuteToast({
                             type: "error",
@@ -44,7 +49,7 @@
                         return;
                     }
 
-                    // Apply Coupon Code
+                    // คำนวณส่วนลดตามประเภทของคูปอง
                     let discount = 0;
                     if (coupon.type == 'Fixed') {
                         discount = coupon.value;
@@ -65,16 +70,19 @@
                 })
         }
 
+        // ฟังก์ชันที่ทำงานเมื่อหน้าเว็บโหลดเสร็จ
         if (isCartNotEmpty()) {
             setTimeout(() => {
                 let items = mCart._getItems();
                 let ids = Object.keys(items);
 
+                // ดึงข้อมูลสินค้าจากเซิร์ฟเวอร์โดยใช้ IDs
                 axios.get(`${window.location.href}/products?ids=${ids}`)
                     .then((res) => {
                         let html = '';
                         res.data.forEach(item => {
                             let qty = mCart.getQty(item.id);
+                            // สร้าง HTML สำหรับแสดงข้อมูลสินค้าแต่ละรายการ
                             html += `<div class="flex gap-4">
                                     <div class="bg-gray-100 rounded shadow p-2">
                                         <img class="w-20" src="${'/storage/'+item.product.oldest_image.path}" alt="">
@@ -117,6 +125,8 @@
             setEmptyView();
         }
 
+        
+
         const checkout = () => {
             if (!isCartNotEmpty()) return;
 
@@ -152,51 +162,13 @@
                     openRazorpay(data.id, data.key, data.amount, data.razorpay_order_id);
                 })
                 .catch((error) => {
-                    cuteToast({
-                        type: 'error',
-                        message: error.message
-                    });
-                })
-
+                    // ไม่ต้องแสดงข้อความแจ้งเตือนข้อผิดพลาด
+                    console.error(error); // แสดงข้อผิดพลาดในคอนโซลสำหรับการตรวจสอบ
+                });
         }
 
-        @auth
-        const openRazorpay = (id, key, amount, razorpay_order_id) => {
-            var options = {
-                'key': key,
-                'amount': amount,
-                'currency': 'INR',
-                'name': "{{ config('app.name') }}",
-                'description': "Buy product form {{ config('app.name') }}",
-                'image': `${window.location.origin}/images/logo.png`,
-                'order_id': razorpay_order_id,
-                'callback_url': `${window.location.origin}/payment/verify/${id}`,
-                'prefill': {
-                    'name': "{{ auth()->user()->full_name }}",
-                    'email': "{{ auth()->user()->email }}",
-                    'contact': "{{ auth()->user()->mobile }}",
-                },
-                'theme': {
-                    'color': '#00bb0d'
-                },
-            };
 
-            var rzp1 = new Razorpay(options);
-            rzp1.on('payment.failed', (response) => {
-                axios.post("{{ route('payment.fail') }}", {
-                        razorpay_order_id
-                    })
-                    .then((res) => {
-                        window.location.href =
-                            "{{ route('account.index', ['tab' => 'orders', 'msg' => 'Payment Failed!']) }}";
-                    })
-                    .catch((error) => {
-                        window.location.reload();
-                    })
-            })
-            rzp1.open();
-        }
-        @endauth
+
     </script>
 @endpush
 
@@ -225,7 +197,7 @@
                                             class="text-gray-400 cursor-pointer"><i class='bx bx-pencil'></i> Edit</a>
                                     </div>
                                     <p class="text-gray-400 text-sm leading-4">{{ $item->full_address }}</p>
-                                    <p class="text-gray-600 text-sm">Mobile No: +91 {{ $item->mobile_no }}</p>
+                                    <p class="text-gray-600 text-sm">Mobile No: +66 {{ $item->mobile_no }}</p>
                                 </div>
                                 <i
                                     class='hidden peer-checked:block absolute -top-3 -right-2 bx bxs-check-circle text-xl text-violet-600 bg-white'></i>
@@ -254,14 +226,18 @@
                 </div>
                 {{-- Delivery Addresses End --}}
 
+                {{-- ส่วนแสดงรายการสินค้าในตะกร้า --}}
                 <div id="itemContainer" class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
+                    <div class="flex gap-4">
+                                    
+                    </div>
                 </div>
             </div>
             {{-- Left Side End --}}
 
             {{-- Right Side --}}
             <div>
+                {{-- ส่วนแสดงรายละเอียดคำสั่งซื้อ และการอัปโหลดหลักฐานการชำระเงิน --}}
                 <div class="bg-white rounded-md shadow-md p-2">
                     <h3 class="mb-3 text-black font-medium uppercase">Order Details</h3>
 
@@ -300,39 +276,37 @@
                         <span class="text-green-500 font-bold">$<span id="discount_msg">0</span></span>
                     </div>
 
-                    @auth
-                        <button type="button" onclick="checkout()"
-                            class="mt-5 bg-violet-600 text-white font-bold text-center w-full py-1 rounded shadow">Checkout</button>
-                    @else
-                        <button type="button" onclick="toggleLoginPopup()"
-                            class="mt-5 bg-violet-600 text-white font-bold text-center w-full py-1 rounded shadow">Checkout</button>
-                    @endauth
+                    <form action="/session" method="POST" onsubmit="checkout()">
+                        @csrf
+                        <button type="submit" id="checkout-live-button" class="mt-5 bg-violet-600 text-white font-bold text-center w-full py-1 rounded shadow">
+                            Checkout
+                        </button>
+                    </form>
+                    
+                    @guest
+                        <button type="button" onclick="toggleLoginPopup()" class="mt-5 bg-violet-600 text-white font-bold text-center w-full py-1 rounded shadow">
+                            Login to Checkout
+                        </button>
+                    @endguest
+                    
 
+                    {{-- <div class="mt-4">
+                        <h3 class="mb-3 text-black font-medium uppercase">Payment Slip Upload</h3>
+                        <div>
+                            <input type="file" id="paymentSlipInput" accept="image/*">
+                            <button onclick="uploadPaymentSlip()"
+                                class="mt-2 bg-violet-600 text-white font-bold text-center py-1 px-4 rounded shadow">Upload</button>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-center">
+                        <img src="{{asset('/images/qrcode.png')}}" alt="QR Code" width="200" height="200">
+                    </div> --}}
                 </div>
+                {{-- <!-- แสดงรูปภาพ QR code ที่นี่ -->
+                <div id="qrcode" class="mt-6 mx-auto"></div> --}}
             </div>
             {{-- Right Side End --}}
 
         </div>
-
-        {{-- <div>
-            <h3 class="mb-4 text-gray-700 text-lg font-medium">Payment Method</h3>
-
-            <div class="flex flex-wrap gap-3">
-                <label for="" class="border border-slate-300 rounded p-2">
-                    <input type="radio" name="payment_method" id="" class="hidden peer">
-                    <span class="text-gray-400 font-medium uppercase">Pay On Delivery</span>
-                </label>
-
-                <label for="" class="border border-slate-300 rounded py-2 px-6">
-                    <input type="radio" name="payment_method" id="" class="hidden peer">
-                    <span class="text-gray-400 font-medium uppercase">UPI</span>
-                </label>
-
-                <label for="" class="border border-slate-300 rounded p-2">
-                    <input type="radio" name="payment_method" id="" class="hidden peer">
-                    <span class="text-gray-400 font-medium uppercase">Paytm</span>
-                </label>
-            </div>
-        </div> --}}
     </section>
 @endsection

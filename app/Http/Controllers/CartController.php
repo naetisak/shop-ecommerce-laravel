@@ -126,6 +126,8 @@ class CartController extends Controller
 
         # Razorpay End
     }
+
+    
     public function paymentFailed(Request $request)
     {
         Order::where('razorpay_order_id', $request->razorpay_order_id)

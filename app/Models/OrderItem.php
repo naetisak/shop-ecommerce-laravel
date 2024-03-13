@@ -21,4 +21,9 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Variant::class);
     }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

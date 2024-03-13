@@ -1,49 +1,85 @@
 <?php
 
-use App\Http\Controllers\AccountController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Artisan;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentSlipController;
+use App\Http\Controllers\StripeController;
 
-Route::get('/', [HomeController::class, 'index'])->name('landing-page');
-Route::get('/pd/{slug}', [HomeController::class, 'productDetail'])->name('product_detail');
-Route::get('/products', [HomeController::class, 'products'])->name('products');
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
 
-// Auth Routes
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/register', [AuthController::class, 'register'])->name('register');
-Route::post('/forgot', [AuthController::class, 'forgot'])->name('forgot');
-Route::match(['GET', 'POST'], '/update-password', [AuthController::class, 'updatePassword'])->name('update-password');
-
-// Account Routes
-Route::prefix('account')->group(function () {
-    Route::get('/', [AccountController::class, 'index'])->name('account.index');
-    Route::post('/', [AccountController::class, 'index'])->name('account.index');
-    Route::get('orders/{id}', [AccountController::class, 'showOrder'])->name('order.show');
-    Route::get('address', [AccountController::class, 'newAddress'])->name('address.create');
-    Route::post('address', [AccountController::class, 'newAddress'])->name('address.store');
-    Route::get('address/{id}', [AccountController::class, 'editAddress'])->name('address.edit');
-    Route::put('address/{id}', [AccountController::class, 'editAddress'])->name('address.update');
+Route::controller(\App\Http\Controllers\HomeController::class)->group(function () {
+    Route::get('/', 'index')->name('landing-page');
+    Route::get('/pd/{slug}', 'productDetail')->name('product_detail');
+    Route::get('/products', 'products')->name('products');
 });
 
-// Cart Routes
-Route::get('/cart', [CartController::class, 'index'])->name('cart');
-Route::get('/cart/products', [CartController::class, 'apiCartProducts']);
-Route::post('/cart/coupon', [CartController::class, 'apiApplyCoupon']);
-Route::post('/payment/init', [CartController::class, 'initPayment'])->name('payment.init');
-Route::post('/payment/failed', [CartController::class, 'paymentFailed'])->name('payment.fail');
-Route::post('/payment/verify/{id}', [CartController::class, 'paymentVerify']);
+Route::controller(App\Http\Controllers\AuthController::class)->group(function () {
+    Route::get('/logout', 'logout')->name('logout');
+    Route::post('/login', 'login')->name('login');
+    Route::post('/register', 'register')->name('register');
+    Route::post('/forgot', 'forgot')->name('forgot');
+    Route::match(['GET', 'POST'], '/update-password', 'updatePassword')->name('update-password');
+});
 
-// Wishlist Routes
-Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
-Route::post('/wishlist/{id}', [WishlistController::class, 'toggle']);
+Route::controller(App\Http\Controllers\AccountController::class)->group(function () {
+
+    Route::prefix('account')->group(function () {
+        Route::get('orders/{id}', 'showOrder')->name('order.show');
+        Route::get('address', 'newAddress')->name('address.create');
+        Route::post('address', 'newAddress')->name('address.store');
+        Route::get('address/{id}', 'editAddress')->name('address.edit');
+        Route::put('address/{id}', 'editAddress')->name('address.update');
+    });
+
+    Route::get('account/', 'index')->name('account.index');
+    Route::post('account/', 'index')->name('account.index');
+});
+
+Route::controller(\App\Http\Controllers\CartController::class)->group(function () {
+    Route::get('/cart', 'index')->name('cart');
+    Route::get('/cart/products', 'apiCartProducts');
+    Route::post('/cart/coupon', 'apiApplyCoupon');
+    Route::post('/payment/init', 'initPayment')->name('payment.init');
+    Route::post('/payment/failed', 'paymentFailed')->name('payment.fail');
+    Route::post('/payment/verify/{id}', 'paymentVerify');
+});
+
+Route::controller(\App\Http\Controllers\WishlistController::class)->group(function () {
+    Route::get('/wishlist', 'index')->name('wishlist');
+    Route::post('/wishlist/{id}', 'toggle');
+});
 
 // Payment Route
-Route::post('/create-payment-intent', [PaymentController::class, 'createPaymentIntent']);
+Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
+Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout_success');
+Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout_cancel');
+
+// New route to store payment slip
+Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/upload-payment-slip', [PaymentSlipController::class, 'upload'])->name('upload.payment.slip');
 
 
+Route::get('/cart', [StripeController::class, 'index'])->name('cart');
+Route::get('/cart/products', [StripeController::class, 'apiCartProducts'])->name('apiCartProducts');
+Route::get('/cart/coupon', [StripeController::class, 'apiApplyCoupon'])->name('apiApplyCoupon');
+Route::post('/session', [StripeController::class, 'session'])->name('session');
+Route::get('/success', [StripeController::class, 'success'])->name('success');
+Route::get('/cancel', [StripeController::class, 'cancel'])->name('cancel');
+
+Route::view('/no-products-in-cart', 'no_products_in_cart')->name('no_products_in_cart');
+
+
+
+?>

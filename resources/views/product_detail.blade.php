@@ -1,81 +1,74 @@
 @extends('layouts.app')
 
 @push('scripts')
-    <x-url-generator-js />
+    <x-url-generator-js /> <!-- เรียกใช้งานคอมโพเนนต์ x-url-generator-js -->
     <script>
-        let currentImage = 0;
-        let color_id = '{{ request()->c ?? null }}';
-        let size_id = '{{ request()->s ?? null }}';
+        let currentImage = 0; // กำหนดตัวแปร currentImage สำหรับเก็บค่าลำดับรูปภาพปัจจุบัน
+        let color_id = '{{ request()->c ?? null }}'; // รับค่า parameter c จาก URL query string หากไม่มีให้กำหนดเป็น null
+        let size_id = '{{ request()->s ?? null }}'; // รับค่า parameter s จาก URL query string หากไม่มีให้กำหนดเป็น null
 
+        // ฟังก์ชันสำหรับเลือกสี
         const selectColor = (cid) => {
-            c = color_id ? null : cid;
-            window.location.href = generateUrl({
-                c
-            })
+            c = color_id ? null : cid; // ตรวจสอบว่ามีการเลือกสีหรือไม่ หากมีให้เลือกสีอื่นๆ หากไม่มีให้กำหนดเป็น null
+            window.location.href = generateUrl({ c }); // เรียกใช้งานฟังก์ชัน generateUrl เพื่อสร้าง URL ใหม่
         }
+
+        // ฟังก์ชันสำหรับเลือกขนาด
         const selectSize = (sid) => {
-            s = size_id ? null : sid;
-            window.location.href = generateUrl({
-                s
-            })
+            s = size_id ? null : sid; // ตรวจสอบว่ามีการเลือกขนาดหรือไม่ หากมีให้เลือกขนาดอื่นๆ หากไม่มีให้กำหนดเป็น null
+            window.location.href = generateUrl({ s }); // เรียกใช้งานฟังก์ชัน generateUrl เพื่อสร้าง URL ใหม่
         }
 
+        // ฟังก์ชันสำหรับดูภาพสินค้า
         const viewImage = (e, index) => {
-
-            currentImage = index;
-
-            document.getElementById('bigImage').src = e.querySelector('img').src;
+            currentImage = index; // กำหนดค่า currentImage เป็นลำดับภาพปัจจุบัน
+            document.getElementById('bigImage').src = e.querySelector('img').src; // แสดงภาพใหญ่ที่เลือกด้วย currentImage
         }
 
+        // ฟังก์ชันสำหรับการเลื่อนภาพถัดไปหรือก่อนหน้า
         const nextPrevious = (index) => {
-
-            i = currentImage + index;
-
-            let images = document.getElementById('images').querySelectorAll('img');
-
-            if (i >= images.length || i < 0) return;
-
-            currentImage = i;
-
+            i = currentImage + index; // คำนวณค่าลำดับภาพถัดไปหรือก่อนหน้า
+            let images = document.getElementById('images').querySelectorAll('img'); // เลือกภาพทั้งหมด
+            if (i >= images.length || i < 0) return; // ตรวจสอบว่าค่าลำดับภาพเกินขอบเขตหรือไม่
+            currentImage = i; // กำหนดค่า currentImage ใหม่
             let arr = [];
-
-            images.forEach(element => arr.push(element.src));
-
-            document.getElementById('bigImage').src = arr[currentImage];
+            images.forEach(element => arr.push(element.src)); // สร้างอาเรย์เก็บ URL ของภาพ
+            document.getElementById('bigImage').src = arr[currentImage]; // แสดงภาพใหญ่ที่เลือกด้วย currentImage
         }
 
+        // ฟังก์ชันสำหรับเพิ่มสินค้าลงในตะกร้า
         const addToCart = () => {
-            let count = '{{ $product->variant->count() }}';
-            if (count != 1) {
+            let count = '{{ $product->variant->count() }}'; // นับจำนวนตัวเลือกสินค้า
+            if (count != 1) { // ถ้าไม่มีตัวเลือกเพียงตัวเดียว
                 cuteToast({
                     type: 'info',
-                    message: 'Please select color & size'
+                    message: 'Please select color & size' // แสดงข้อความเตือนให้เลือกสีและขนาด
                 })
                 return;
             }
-
-            let variantId = '{{ $product->variant[0]->id }}';
-            if (!mCart.isInCart(variantId)) {
-                mCart.add(variantId, 1);
+            let variantId = '{{ $product->variant[0]->id }}'; // รหัสตัวเลือกสินค้า
+            if (!mCart.isInCart(variantId)) { // ตรวจสอบว่าสินค้าอยู่ในตะกร้าแล้วหรือไม่
+                mCart.add(variantId, 1); // เพิ่มสินค้าลงในตะกร้า
                 cuteToast({
                     type: 'success',
-                    message: 'Added In Cart'
+                    message: 'Added In Cart' // แสดงข้อความเตือนว่าเพิ่มสินค้าลงในตะกร้าเรียบร้อย
                 })
             }
-
-            document.getElementById('add_to_cart_btn').innerHTML = 'Added In Cart';
-            cartCount();
-            return true;
+            document.getElementById('add_to_cart_btn').innerHTML = 'Added In Cart'; // ปรับเปลี่ยนข้อความบนปุ่มเป็น "Added In Cart"
+            cartCount(); // อัปเดตจำนวนสินค้าในตะกร้า
+            return true; // ส่งค่าคืนว่าการเพิ่มสินค้าลงในตะกร้าเสร็จสมบูรณ์
         }
+
+        // ฟังก์ชันสำหรับการซื้อสินค้าทันที
         const buyNow = () => {
-            if (addToCart()) {
-                window.location.href = "{{ route('cart') }}";
+            if (addToCart()) { // เรียกใช้ฟังก์ชัน addToCart และตรวจสอบว่าสินค้าถูกเพิ่มลงในตะกร้าเรียบร้อย
+                window.location.href = "{{ route('cart') }}"; // แสดงหน้าตะกร้าสินค้า
             }
         }
 
+        // ฟังก์ชันสำหรับตรวจสอบว่ามีสินค้าในตะกร้าหรือไม่และทำการเปลี่ยนข้อความบนปุ่มให้เป็น "Added In Cart" หากมี
         @if ($product->variant->count() == 1)
             let variantId = '{{ $product->variant[0]->id }}';
-
             if (mCart.isInCart(variantId)) document.getElementById('add_to_cart_btn').innerHTML = 'Added In Cart';
         @endif
     </script>
@@ -83,11 +76,12 @@
 
 @section('body_content')
 <section class="px-6 md:px-20 mt-6">
-    <div class="flex flex-wrap md:flex-nowrap gap-6 justify-center"> <!-- เพิ่มคลาส justify-center เพื่อจัดให้เนื้อหาอยู่ตรงกลาง -->
+    <div class="flex flex-wrap md:flex-nowrap gap-6 justify-center">
 
         {{-- Left --}}
         <div class="shrink-0 w-full md:w-auto flex flex-col-reverse md:flex-row gap-4">
             <div id="images" class="flex md:flex-col gap-2 pb-1 md:pb-0 max-h-96 overflow-y-auto">
+                {{-- วนลูปเพื่อแสดงรูปภาพสินค้า --}}
                 @foreach ($product->image as $image)
                     <div onclick="viewImage(this, {{ $image->id }})"
                         class="bg-white rounded-md shadow p-1 cursor-pointer w-14 h-14 md:w-12 md:h-12 lg:w-16 lg:h-16">
@@ -96,7 +90,9 @@
                 @endforeach
             </div>
             <div class="h-auto md:h-96 relative bg-white rounded-md shadow-md p-3">
+                {{-- รูปภาพหลัก --}}
                 <img id="bigImage" class="w-full h-full object-contain" src="{{ asset('storage/' . $product->image[0]->path) }}" alt="">
+                {{-- ปุ่มเลื่อนรูปภาพ --}}
                 <span onclick="nextPrevious(-1)" class="absolute top-1/2 left-1 bg-white rounded-full w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 shadow flex items-center justify-center">
                     <i class='bx bx-chevron-left text-xl text-gray-400 hover:text-violet-600 duration-200 cursor-pointer'></i>
                 </span>
@@ -109,6 +105,7 @@
 
         {{-- Right --}}
         <div class="w-full md:w-1/3 flex flex-col gap-4 bg-white p-6 rounded-md shadow-md">
+            {{-- แสดงส่วนข้อมูลของสินค้า --}}
             <div class="flex gap-3">
                 @php
                     $discount = (($product->variant[0]->mrp - $product->variant[0]->selling_price) / $product->variant[0]->mrp) * 100;
@@ -116,24 +113,21 @@
                 <span class="bg-red-500 text-white rounded px-2 text-xs">{{ round($discount, 2) }}% Off</span>
                 <span class="text-gray-400 text-sm"><i class='bx bx-star'></i> 4.5</span>
             </div>
-
-            {{-- Name, SKU, Brand --}}
             <h2 class="text-lg font-medium text-gray-800">{{ $product->title }}</h2>
             <div class="text-sm text-gray-800">
                 <p><span class="text-gray-400">SKU:</span> {{ $product->variant[0]->sku }}</p>
                 <p><span class="text-gray-400">Brand:</span> {{ $product->brand->name }}</p>
             </div>
-
-            {{-- Price --}}
+            {{-- แสดงราคา --}}
             <div>
-                <span class="text-rose-500 font-bold text-xl">₹{{ $product->variant[0]->selling_price }}</span>
-                <sub class="text-gray-400"><strike>₹{{ $product->variant[0]->mrp }}</strike></sub>
+                <span class="text-rose-500 font-bold text-xl">${{ $product->variant[0]->selling_price }}</span>
+                <sub class="text-gray-400"><strike>${{ $product->variant[0]->mrp }}</strike></sub>
             </div>
-
-            {{-- Colors --}}
-            <div class="mt-4"> <!-- เพิ่มคลาส mt-4 เพื่อเพิ่มระยะห่างด้านบน -->
+            {{-- เลือกสี --}}
+            <div class="mt-4">
                 <p class="text-gray-400">Colors:</p>
                 <div class="flex gap-1">
+                    {{-- วนลูปเพื่อแสดงสีที่สินค้ามี --}}
                     @foreach ($product->variant as $item)
                         <span onclick="selectColor('{{ $item->color->id }}')"
                             style="background-color: {{ $item->color->code }}"
@@ -141,11 +135,11 @@
                     @endforeach
                 </div>
             </div>
-
-            {{-- Sizes --}}
+            {{-- เลือกขนาด --}}
             <div>
                 <p class="text-gray-400">Sizes:</p>
                 <div class="flex gap-1 text-gray-400 text-sm">
+                    {{-- วนลูปเพื่อแสดงขนาดที่สินค้ามี --}}
                     @foreach ($product->variant as $item)
                         <span onclick="selectSize('{{ $item->size->id }}')"
                             class="flex justify-center cursor-pointer items-center rounded-full border border-gray-400 px-2 py-1">{{ $item->size->code }}</span>
@@ -153,14 +147,11 @@
                 </div>
                 <a href="#" class="text-gray-400 text-xs">Size Guide</a>
             </div>
-
-
-            {{-- Wishlist, Add to Cart and Buy Now --}}
-            <div class="flex items-center gap-4 mt-4"> <!-- เพิ่มคลาส mt-4 เพื่อเพิ่มระยะห่างด้านบน -->
+            {{-- ปุ่มเพิ่มสินค้าในตะกร้าและซื้อทันที --}}
+            <div class="flex items-center gap-4 mt-4">
                 <button onclick="toggleWishlist(this, '{{ $product->id }}')" class="bg-white shadow-md rounded-full w-7 h-7 flex items-center justify-center">
                     <i class='bx  {{ $product->has_favorited ? 'bxs-heart text-red-500' : 'bx-heart' }} text-xl'></i>
                 </button>
-
                 <button onclick="addToCart()" id="add_to_cart_btn"
                     class="border border-violet-600 rounded w-28 text-center drop-shadow font-medium text-violet-600 py-0.5">Add
                     to Cart</button>
@@ -168,29 +159,26 @@
                     class="border border-violet-600 rounded w-28 text-center drop-shadow font-medium text-white bg-violet-600 py-0.5">Buy
                     Now</button>
             </div>
-
         </div>
         {{-- Right End --}}
     </div>
+    {{-- แสดงคำอธิบายสินค้า --}}
 
-    {{-- Product Description --}}
     <div class="mt-6">
-        <h3 class="text-lg text-gray-400 font-medium mb-2">Product Description</h3>
+        <h3 class="text-lg text-gray-400 font-medium my-6">Product Description</h3>
+        {{-- แสดงข้อมูล description ของสินค้า --}}
         <div class="text-gray-600">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad tenetur consectetur aspernatur veritatis rem,
-            asperiores necessitatibus corporis doloremque repellendus et cumque reprehenderit, nisi vitae autem iste
-            quia temporibus, fugiat ea voluptates velit tempora quae! Cupiditate debitis eaque ex. Similique aperiam
-            rerum inventore est fugiat, optio amet ratione sequi doloribus illum iure suscipit voluptatum ut repellat
-            non, impedit, et harum? Ipsam porro deleniti voluptatum fugiat quibusdam. Blanditiis eos perspiciatis
-            voluptatum. Deserunt praesentium fuga quisquam neque possimus, adipisci officiis. Sit quo a voluptas quidem
-            minima debitis culpa aliquam voluptatibus repellendus repudiandae explicabo totam, quaerat odit, in alias
-            facere ullam, commodi expedita fugit!
+            {{ $product->description }}
         </div>
     </div>
 
+
+
+    {{-- แสดงสินค้าแนะนำ --}}
     <section class="mt-6">
         <h3 class="text-gray-800 font-medium mb-2">Featured Product</h3>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 justify-center"> <!-- เพิ่มคลาส justify-center เพื่อจัดให้เนื้อหาอยู่ตรงกลาง -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 justify-center">
+            <!-- วนลูปเพื่อแสดงสินค้าแนะนำ -->
             @foreach ($products as $item)
                 @if ($item->variant->isNotEmpty())
                     <x-product.card1 :product="$item" />
@@ -198,6 +186,5 @@
             @endforeach
         </div>
     </section>
-
 </section>
 @endsection
